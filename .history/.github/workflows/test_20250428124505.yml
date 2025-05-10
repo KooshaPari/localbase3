@@ -1,0 +1,48 @@
+name: Test
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        node-version: [18.x]
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+    
+    - name: Test Frontend
+      run: |
+        cd localbase-frontend
+        npm ci
+        npm test -- --coverage
+    
+    - name: Test API
+      run: |
+        cd localbase-api
+        npm ci
+        npm test -- --coverage
+    
+    - name: Upload Frontend Coverage
+      uses: codecov/codecov-action@v3
+      with:
+        directory: ./localbase-frontend/coverage
+        flags: frontend
+    
+    - name: Upload API Coverage
+      uses: codecov/codecov-action@v3
+      with:
+        directory: ./localbase-api/coverage
+        flags: api

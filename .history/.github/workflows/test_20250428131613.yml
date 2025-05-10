@@ -1,0 +1,198 @@
+name: Test
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  unit-tests:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [18.x]
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: "npm"
+
+      - name: Frontend Unit Tests
+        run: |
+          cd localbase-frontend
+          npm ci
+          npm test -- --coverage
+
+      - name: API Unit Tests
+        run: |
+          cd localbase-api
+          npm ci
+          npm test -- --coverage
+
+      - name: Upload Frontend Coverage
+        uses: codecov/codecov-action@v3
+        with:
+          directory: ./localbase-frontend/coverage
+          flags: frontend
+
+      - name: Upload API Coverage
+        uses: codecov/codecov-action@v3
+        with:
+          directory: ./localbase-api/coverage
+          flags: api
+
+  e2e-tests:
+    runs-on: ubuntu-latest
+    needs: unit-tests
+
+    strategy:
+      matrix:
+        node-version: [18.x]
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: "npm"
+
+      - name: Install Cypress
+        run: |
+          cd localbase-frontend
+          npm ci
+
+      - name: Run E2E Tests
+        uses: cypress-io/github-action@v5
+        with:
+          working-directory: localbase-frontend
+          build: npm run build
+          start: npm start
+          wait-on: "http://localhost:3000"
+          browser: chrome
+          headed: false
+
+  accessibility-tests:
+    runs-on: ubuntu-latest
+    needs: unit-tests
+
+    strategy:
+      matrix:
+        node-version: [18.x]
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: "npm"
+
+      - name: Install Dependencies
+        run: |
+          cd localbase-frontend
+          npm ci
+
+      - name: Run Accessibility Tests
+        uses: cypress-io/github-action@v5
+        with:
+          working-directory: localbase-frontend
+          build: npm run build
+          start: npm start
+          wait-on: "http://localhost:3000"
+          browser: chrome
+          headed: false
+          spec: cypress/e2e/accessibility.cy.ts
+
+  performance-tests:
+    runs-on: ubuntu-latest
+    needs: unit-tests
+
+    strategy:
+      matrix:
+        node-version: [18.x]
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: "npm"
+
+      - name: Install Dependencies
+        run: |
+          cd localbase-frontend
+          npm ci
+          npm install -g lighthouse
+
+      - name: Start Frontend Server
+        run: |
+          cd localbase-frontend
+          npm run build
+          npm start &
+          sleep 10
+
+      - name: Run Lighthouse Tests
+        run: |
+          cd localbase-frontend
+          lighthouse http://localhost:3000 --output=json --output-path=./lighthouse-report.json --chrome-flags="--headless --no-sandbox --disable-gpu"
+
+      - name: Upload Lighthouse Report
+        uses: actions/upload-artifact@v3
+        with:
+          name: lighthouse-report
+          path: localbase-frontend/lighthouse-report.json
+
+  load-tests:
+    runs-on: ubuntu-latest
+    needs: unit-tests
+
+    strategy:
+      matrix:
+        node-version: [18.x]
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: "npm"
+
+      - name: Install Dependencies
+        run: |
+          cd localbase-api
+          npm ci
+
+      - name: Install k6
+        run: |
+          curl -L https://github.com/grafana/k6/releases/download/v0.42.0/k6-v0.42.0-linux-amd64.tar.gz | tar xz
+          sudo cp k6-v0.42.0-linux-amd64/k6 /usr/local/bin
+
+      - name: Start API Server
+        run: |
+          cd localbase-api
+          npm start &
+          sleep 10
+
+      - name: Run Load Tests
+        run: |
+          cd localbase-api
+          k6 run load-tests/api-load-test.js --summary-export=load-test-report.json
+
+      - name: Upload Load Test Report
+        uses: actions/upload-artifact@v3
+        with:
+          name: load-test-report
+          path: localbase-api/load-test-report.json

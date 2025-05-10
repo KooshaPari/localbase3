@@ -1,0 +1,40 @@
+package types
+
+import (
+	sdkerrors "cosmossdk.io/errors"
+)
+
+// Staking module sentinel errors
+var (
+	ErrEmptyValidatorAddr              = sdkerrors.Register(ModuleName, 1, "empty validator address")
+	ErrNoValidatorFound                = sdkerrors.Register(ModuleName, 2, "validator does not exist")
+	ErrValidatorOwnerExists            = sdkerrors.Register(ModuleName, 3, "validator already exists for this operator address")
+	ErrValidatorPubKeyExists           = sdkerrors.Register(ModuleName, 4, "validator already exists for this pubkey")
+	ErrValidatorPubKeyTypeNotSupported = sdkerrors.Register(ModuleName, 5, "validator pubkey type is not supported")
+	ErrValidatorJailed                 = sdkerrors.Register(ModuleName, 6, "validator is jailed")
+	ErrBadRemoveValidator              = sdkerrors.Register(ModuleName, 7, "failed to remove validator")
+	ErrSelfDelegationBelowMinimum      = sdkerrors.Register(ModuleName, 8, "validator's self delegation below minimum")
+	ErrMinSelfDelegationDecreased      = sdkerrors.Register(ModuleName, 9, "minimum self delegation cannot be decreased")
+	ErrEmptyDelegatorAddr              = sdkerrors.Register(ModuleName, 10, "empty delegator address")
+	ErrNoDelegation                    = sdkerrors.Register(ModuleName, 11, "no delegation for this (delegator, validator) pair")
+	ErrBadDelegatorAddr                = sdkerrors.Register(ModuleName, 12, "delegator does not exist")
+	ErrNoDelegatorForAddress           = sdkerrors.Register(ModuleName, 13, "delegator does not contain delegation")
+	ErrInsufficientShares              = sdkerrors.Register(ModuleName, 14, "insufficient delegation shares")
+	ErrDelegationValidatorEmpty        = sdkerrors.Register(ModuleName, 15, "cannot delegate to an empty validator")
+	ErrNotEnoughDelegationShares       = sdkerrors.Register(ModuleName, 16, "not enough delegation shares")
+	ErrNotMature                       = sdkerrors.Register(ModuleName, 17, "entry not mature")
+	ErrNoUnbondingDelegation           = sdkerrors.Register(ModuleName, 18, "no unbonding delegation found")
+	ErrMaxUnbondingDelegationEntries   = sdkerrors.Register(ModuleName, 19, "too many unbonding delegation entries")
+	ErrNoRedelegation                  = sdkerrors.Register(ModuleName, 20, "no redelegation found")
+	ErrSelfRedelegation                = sdkerrors.Register(ModuleName, 21, "cannot redelegate to the same validator")
+	ErrTinyRedelegationAmount          = sdkerrors.Register(ModuleName, 22, "too few tokens to redelegate")
+	ErrBadRedelegationDst              = sdkerrors.Register(ModuleName, 23, "redelegation destination validator not found")
+	ErrTransitiveRedelegation          = sdkerrors.Register(ModuleName, 24, "redelegation to this validator already in progress")
+	ErrMaxRedelegationEntries          = sdkerrors.Register(ModuleName, 25, "too many redelegation entries")
+	ErrDelegatorShareExRateInvalid     = sdkerrors.Register(ModuleName, 26, "invalid delegator share exchange rate")
+	ErrBothShareMsgsGiven              = sdkerrors.Register(ModuleName, 27, "both shares amount and shares percent provided")
+	ErrNeitherShareMsgsGiven           = sdkerrors.Register(ModuleName, 28, "neither shares amount nor shares percent provided")
+	ErrInvalidHistoricalInfo           = sdkerrors.Register(ModuleName, 29, "invalid historical info")
+	ErrNoHistoricalInfo                = sdkerrors.Register(ModuleName, 30, "no historical info found")
+	ErrEmptyValidatorPubKey            = sdkerrors.Register(ModuleName, 31, "empty validator public key")
+)

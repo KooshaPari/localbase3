@@ -1,0 +1,58 @@
+# LocalBase Provider Node Configuration
+
+# Provider configuration
+provider:
+  name: "My Provider Node"
+  region: "us-west"
+  
+# Hardware configuration
+hardware:
+  gpu_memory_reserve: 1024  # MB to reserve for system
+  cpu_cores_reserve: 2      # CPU cores to reserve for system
+  
+# Blockchain configuration
+blockchain:
+  node_url: "http://localhost:26657"
+  chain_id: "localbase-1"
+  wallet_mnemonic: "your wallet mnemonic phrase"
+  gas_price: "0.025ulb"
+  gas_adjustment: 1.5
+  
+# Models configuration
+models:
+  - id: "lb-llama-3-70b"
+    path: "models/llama-3-70b"
+    format: "gguf"
+    pricing:
+      input_price_per_token: 0.00000002
+      output_price_per_token: 0.00000005
+  - id: "lb-mixtral-8x7b"
+    path: "models/mixtral-8x7b"
+    format: "gguf"
+    pricing:
+      input_price_per_token: 0.00000001
+      output_price_per_token: 0.00000003
+  - id: "lb-embedding-ada-002"
+    path: "models/embedding-ada-002"
+    format: "onnx"
+    pricing:
+      input_price_per_token: 0.00000001
+      
+# Security configuration
+security:
+  max_memory_per_job: 24000  # MB
+  max_cpu_per_job: 8         # CPU cores
+  network_isolation: true
+  allowed_outbound_hosts: []  # Empty list means no outbound connections
+  
+# Job configuration
+job:
+  max_concurrent_jobs: 4
+  poll_interval: 5  # seconds
+  timeout: 300      # seconds
+  
+# API configuration
+api:
+  host: "0.0.0.0"
+  port: 8080
+  log_level: "info"

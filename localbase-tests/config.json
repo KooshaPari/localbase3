@@ -1,0 +1,25 @@
+{
+  "supabase": {
+    "url": "http://localhost:54321",
+    "anon_key": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0",
+    "service_role_key": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImV4cCI6MTk4MzgxMjk5Nn0.EGIM96RAZx35lJzdJsyH-qQwv8Hdp7fsn3W0YpN81IU",
+    "test_user_email": "test@example.com",
+    "test_user_password": "password123"
+  },
+  "blockchain": {
+    "chain_id": "localbase-testnet-1",
+    "rpc_endpoint": "http://localhost:26657",
+    "rest_endpoint": "http://localhost:1317",
+    "test_mnemonic": "test test test test test test test test test test test junk",
+    "provider_contract": "localbase14hj2tavq8fpesdwxxcu44rty3hh90vhujrvcmstl4zr3txmfvw9s5c2epq",
+    "job_contract": "localbase1nc5tatafv6eyq7llkr2gv50ff9e22mnf70qgjlv737ktmt4eswrqvlx82r"
+  },
+  "frontend": {
+    "url": "http://localhost:3000",
+    "api_url": "http://localhost:3000/api"
+  },
+  "provider": {
+    "url": "http://localhost:8000",
+    "api_key": "test_api_key"
+  }
+}
