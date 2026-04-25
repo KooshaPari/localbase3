@@ -163,6 +163,12 @@ heroku create
 git push heroku main
 ```
 
+## Related Phenotype Projects
+
+- **[DataKit](../DataKit/)** — ETL and schema validation for localbase data
+- **[PhenoSchema](../PhenoSchema/)** — Schema management for localbase schemas
+- **[cloud](../cloud/)** — Multi-tenant platform integrating localbase as edge db
+
 ## Contributing
 
 1. Fork the repository
