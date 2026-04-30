@@ -1,5 +1,7 @@
 # LocalBase
 
+**Status:** maintenance
+
 LocalBase is a decentralized AI compute marketplace built on Cosmos SDK with provider software, OpenRouter-compatible API, and React frontend.
 
 ## Project Structure
