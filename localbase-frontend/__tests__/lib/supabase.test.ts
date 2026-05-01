@@ -234,14 +234,15 @@ describe('Supabase Client', () => {
     
     it('deleteApiKey calls supabase.from("api_keys") with correct parameters', async () => {
       const mockResponse = { data: null, error: null };
-      
+
       supabase.from.mockReturnValueOnce({
         delete: jest.fn().mockReturnThis(),
+        eq: jest.fn().mockReturnThis(),
         eq: jest.fn().mockResolvedValueOnce(mockResponse),
       });
-      
+
       const result = await deleteApiKey('key123', 'user123');
-      
+
       expect(supabase.from).toHaveBeenCalledWith('api_keys');
       expect(result).toEqual(mockResponse);
     });
