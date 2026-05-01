@@ -237,8 +237,12 @@ describe('Supabase Client', () => {
 
       supabase.from.mockReturnValueOnce({
         delete: jest.fn().mockReturnThis(),
-        eq: jest.fn().mockReturnThis(),
-        eq: jest.fn().mockResolvedValueOnce(mockResponse),
+        eq: jest.fn().mockImplementation(function (..._args) {
+          // Chain the second .eq() call to return the promise
+          return {
+            eq: jest.fn().mockResolvedValue(mockResponse),
+          };
+        }),
       });
 
       const result = await deleteApiKey('key123', 'user123');
