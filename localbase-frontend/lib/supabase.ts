@@ -1,28 +1,57 @@
 import { createClient } from "@supabase/supabase-js";
 
-// Environment variable validation
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+// Environment variable names for validation
+const REQUIRED_ENV_VARS = [
+	"NEXT_PUBLIC_SUPABASE_URL",
+	"NEXT_PUBLIC_SUPABASE_ANON_KEY",
+] as const;
 
-// Fail fast if required environment variables are missing
+/**
+ * Validate that all required environment variables are present.
+ * Throws an error with helpful guidance if any are missing.
+ */
 function validateEnvConfig(): void {
-	if (!supabaseUrl || !supabaseAnonKey) {
-		const missingVars: string[] = [];
-		if (!supabaseUrl) missingVars.push("NEXT_PUBLIC_SUPABASE_URL");
-		if (!supabaseAnonKey) missingVars.push("NEXT_PUBLIC_SUPABASE_ANON_KEY");
+	const missing: string[] = [];
 
+	for (const varName of REQUIRED_ENV_VARS) {
+		if (!process.env[varName]) {
+			missing.push(varName);
+		}
+	}
+
+	if (missing.length > 0) {
 		throw new Error(
-			`Missing required environment variables: ${missingVars.join(", ")}. ` +
-			"Please set these in your .env.local file."
+			`Missing required environment variables:\n${missing.map((v) => `  - ${v}`).join("\n")}\n\n` +
+			"Please set these in your .env.local file. See .env.example for reference."
 		);
 	}
 }
 
-// Validate before creating client
-validateEnvConfig();
+/**
+ * Get the Supabase client singleton.
+ * Validates environment variables lazily on first access.
+ */
+let _supabase: ReturnType<typeof createClient> | null = null;
 
-// Create the client with validated configuration
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+function getSupabaseClient() {
+	if (!_supabase) {
+		validateEnvConfig();
+		const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+		const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+		_supabase = createClient(supabaseUrl, supabaseAnonKey);
+	}
+	return _supabase;
+}
+
+/**
+ * Supabase client instance with lazy initialization.
+ * Environment variables are validated on first use rather than at module load.
+ */
+export const supabase = new Proxy({} as ReturnType<typeof createClient>, {
+	get(_target, prop) {
+		return getSupabaseClient()[prop as keyof ReturnType<typeof createClient>];
+	},
+});
 
 // Authentication functions
 export async function signUp(email: string, password: string) {
