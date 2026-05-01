@@ -237,7 +237,6 @@ describe('Supabase Client', () => {
       
       supabase.from.mockReturnValueOnce({
         delete: jest.fn().mockReturnThis(),
-        eq: jest.fn().mockReturnThis(),
         eq: jest.fn().mockResolvedValueOnce(mockResponse),
       });
       

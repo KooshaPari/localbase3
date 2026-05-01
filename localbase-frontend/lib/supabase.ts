@@ -1,26 +1,28 @@
 import { createClient } from "@supabase/supabase-js";
 
-// Initialize the Supabase client
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
+// Environment variable validation
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-if (!supabaseUrl || !supabaseAnonKey) {
-	console.error(
-		"Supabase URL or Anon Key is missing. Please check your environment variables."
-	);
+// Fail fast if required environment variables are missing
+function validateEnvConfig(): void {
+	if (!supabaseUrl || !supabaseAnonKey) {
+		const missingVars: string[] = [];
+		if (!supabaseUrl) missingVars.push("NEXT_PUBLIC_SUPABASE_URL");
+		if (!supabaseAnonKey) missingVars.push("NEXT_PUBLIC_SUPABASE_ANON_KEY");
 
-	// In development, provide fallback values to prevent crashes
-	if (process.env.NODE_ENV === "development") {
-		console.warn("Using fallback Supabase configuration for development");
+		throw new Error(
+			`Missing required environment variables: ${missingVars.join(", ")}. ` +
+			"Please set these in your .env.local file."
+		);
 	}
 }
 
-// Create the client even with empty values to prevent crashes during build
-// The actual connection will fail, but the app will at least build
-export const supabase = createClient(
-	supabaseUrl || "https://placeholder-url.supabase.co",
-	supabaseAnonKey || "placeholder-key"
-);
+// Validate before creating client
+validateEnvConfig();
+
+// Create the client with validated configuration
+export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 // Authentication functions
 export async function signUp(email: string, password: string) {
@@ -80,13 +82,88 @@ export async function getUserProfile(userId: string) {
 	return { data, error };
 }
 
-export async function updateUserProfile(userId: string, updates: any) {
+export async function updateUserProfile(userId: string, updates: UserProfileUpdates): Promise<{ data: UserProfileResponse | null; error: Error | null }> {
 	const { data, error } = await supabase
 		.from("profiles")
 		.update(updates)
 		.eq("id", userId);
 
-	return { data, error };
+	return { data: data as UserProfileResponse | null, error };
+}
+
+// User profile update type
+export interface UserProfileUpdates {
+	name?: string;
+	email?: string;
+	avatar_url?: string;
+	// Allow additional string/number fields
+	[key: string]: string | number | undefined;
+}
+
+// User profile response type
+export interface UserProfileResponse {
+	id: string;
+	name?: string;
+	email?: string;
+	avatar_url?: string;
+	created_at: string;
+	updated_at: string;
+	[key: string]: string | number | undefined;
+}
+
+// API key type
+export interface ApiKeyResponse {
+	id: string;
+	user_id: string;
+	name: string;
+	permissions: string[];
+	key: string;
+	created_at: string;
+}
+
+// Provider response type
+export interface ProviderResponse {
+	id: string;
+	user_id: string;
+	name?: string;
+	type?: string;
+	config?: Record<string, unknown>;
+	status: string;
+	created_at: string;
+	updated_at?: string;
+	[key: string]: unknown;
+}
+
+// Provider data type
+export interface ProviderData {
+	name?: string;
+	type?: string;
+	config?: Record<string, unknown>;
+	// Allow additional fields
+	[key: string]: unknown;
+}
+
+// Job response type
+export interface JobResponse {
+	id: string;
+	user_id: string;
+	name?: string;
+	model?: string;
+	prompt?: string;
+	status: string;
+	created_at: string;
+	updated_at?: string;
+	[key: string]: unknown;
+}
+
+// Job data type
+export interface JobData {
+	name?: string;
+	model?: string;
+	prompt?: string;
+	status?: string;
+	// Allow additional fields
+	[key: string]: unknown;
 }
 
 // API key management
@@ -94,7 +171,10 @@ export async function generateApiKey(
 	userId: string,
 	name: string,
 	permissions: string[]
-) {
+): Promise<{
+	data: ApiKeyResponse | null;
+	error: Error | null;
+}> {
 	const { data, error } = await supabase
 		.from("api_keys")
 		.insert([
@@ -102,14 +182,14 @@ export async function generateApiKey(
 				user_id: userId,
 				name,
 				permissions,
-				key: `lb_${crypto.randomUUID().replace(/-/g, "")}`,
+				key: `lb_${globalThis.crypto.randomUUID().replace(/-/g, "")}`,
 				created_at: new Date().toISOString(),
 			},
 		])
 		.select()
 		.single();
 
-	return { data, error };
+	return { data: data as ApiKeyResponse | null, error };
 }
 
 export async function listApiKeys(userId: string) {
@@ -133,7 +213,7 @@ export async function deleteApiKey(keyId: string, userId: string) {
 }
 
 // Provider functions
-export async function registerProvider(userId: string, providerData: any) {
+export async function registerProvider(userId: string, providerData: ProviderData): Promise<{ data: ProviderResponse | null; error: Error | null }> {
 	const { data, error } = await supabase
 		.from("providers")
 		.insert([
@@ -147,7 +227,7 @@ export async function registerProvider(userId: string, providerData: any) {
 		.select()
 		.single();
 
-	return { data, error };
+	return { data: data as ProviderResponse | null, error };
 }
 
 export async function getProviderDetails(providerId: string) {
@@ -161,7 +241,7 @@ export async function getProviderDetails(providerId: string) {
 }
 
 // Job functions
-export async function createJob(userId: string, jobData: any) {
+export async function createJob(userId: string, jobData: JobData): Promise<{ data: JobResponse | null; error: Error | null }> {
 	const { data, error } = await supabase
 		.from("jobs")
 		.insert([
@@ -175,7 +255,7 @@ export async function createJob(userId: string, jobData: any) {
 		.select()
 		.single();
 
-	return { data, error };
+	return { data: data as JobResponse | null, error };
 }
 
 export async function listJobs(userId: string) {

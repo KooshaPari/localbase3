@@ -2,6 +2,10 @@
   "name": "localbase-frontend",
   "version": "0.1.0",
   "private": true,
+  "exports": {
+    ".": "./lib/supabase.ts",
+    "./*": "./lib/*.ts"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
