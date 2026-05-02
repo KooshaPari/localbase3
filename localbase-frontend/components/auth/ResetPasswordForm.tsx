@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { supabase } from '@/lib/supabase';
+import type { AuthError } from '@supabase/supabase-js';
 
 export default function ResetPasswordForm() {
   const [password, setPassword] = useState('');
@@ -24,8 +26,8 @@ export default function ResetPasswordForm() {
       }
 
       return { data, error: null };
-    } catch (error: any) {
-      return { data: null, error };
+    } catch (error) {
+      return { data: null, error: error as AuthError };
     }
   };
 

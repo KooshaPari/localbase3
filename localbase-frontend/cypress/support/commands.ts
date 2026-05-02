@@ -124,6 +124,15 @@ function terminalLog(violations) {
 	cy.task("table", violationData);
 }
 
+// Axe accessibility testing options interface
+interface A11yOptions {
+	runOnly?: {
+		type: string;
+		values: string[];
+	};
+	rules?: Record<string, unknown>;
+}
+
 declare global {
 	namespace Cypress {
 		interface Chainable {
@@ -140,7 +149,7 @@ declare global {
 			checkApiKeysList(): Chainable<void>;
 			checkJobsList(): Chainable<void>;
 			// Add the custom checkA11y command
-			checkA11y(context?: string | Node, options?: any): Chainable<void>;
+			checkA11y(context?: string | Node, options?: A11yOptions): Chainable<void>;
 		}
 	}
 }

@@ -12,7 +12,9 @@ import {
   deleteApiKey,
   createJob,
   listJobs,
-  getJobDetails
+  getJobDetails,
+  registerProvider,
+  getProviderDetails
 } from '@/lib/supabase';
 import { supabase } from '@/lib/supabase';
 
@@ -53,6 +55,8 @@ jest.mock('@/lib/supabase', () => {
     createJob: jest.requireActual('@/lib/supabase').createJob,
     listJobs: jest.requireActual('@/lib/supabase').listJobs,
     getJobDetails: jest.requireActual('@/lib/supabase').getJobDetails,
+    registerProvider: jest.requireActual('@/lib/supabase').registerProvider,
+    getProviderDetails: jest.requireActual('@/lib/supabase').getProviderDetails,
   };
 });
 
@@ -308,6 +312,108 @@ describe('Supabase Client', () => {
       
       expect(supabase.from).toHaveBeenCalledWith('jobs');
       expect(result).toEqual({ data: mockJob, error: null });
+    });
+  });
+  
+  describe('Provider Functions', () => {
+    it('registerProvider calls supabase.from("providers") with correct parameters', async () => {
+      const mockProvider = {
+        id: 'provider123',
+        user_id: 'user123',
+        name: 'Test Provider',
+        type: 'openai',
+        status: 'pending',
+      };
+      
+      supabase.from.mockReturnValueOnce({
+        insert: jest.fn().mockReturnThis(),
+        select: jest.fn().mockReturnThis(),
+        single: jest.fn().mockResolvedValueOnce({
+          data: mockProvider,
+          error: null,
+        }),
+      });
+      
+      const providerData = { name: 'Test Provider', type: 'openai' };
+      const result = await registerProvider('user123', providerData);
+      
+      expect(supabase.from).toHaveBeenCalledWith('providers');
+      expect(result).toEqual({ data: mockProvider, error: null });
+    });
+    
+    it('registerProvider sets status to pending and adds created_at timestamp', async () => {
+      const mockProvider = {
+        id: 'provider123',
+        user_id: 'user123',
+        name: 'Test Provider',
+        status: 'pending',
+      };
+      
+      let insertedData: Record<string, unknown> = {};
+      supabase.from.mockReturnValueOnce({
+        insert: jest.fn().mockImplementation((data) => {
+          insertedData = data[0];
+          return {
+            select: jest.fn().mockReturnThis(),
+            single: jest.fn().mockResolvedValueOnce({
+              data: mockProvider,
+              error: null,
+            }),
+          };
+        }),
+      });
+      
+      const providerData = { name: 'Test Provider', type: 'openai' };
+      await registerProvider('user123', providerData);
+      
+      expect(insertedData).toMatchObject({
+        user_id: 'user123',
+        name: 'Test Provider',
+        type: 'openai',
+        status: 'pending',
+      });
+      expect(insertedData.created_at).toBeDefined();
+    });
+    
+    it('getProviderDetails calls supabase.from("providers") with correct parameters', async () => {
+      const mockProvider = {
+        id: 'provider123',
+        user_id: 'user123',
+        name: 'Test Provider',
+        type: 'openai',
+        status: 'active',
+      };
+      
+      supabase.from.mockReturnValueOnce({
+        select: jest.fn().mockReturnThis(),
+        eq: jest.fn().mockReturnThis(),
+        single: jest.fn().mockResolvedValueOnce({
+          data: mockProvider,
+          error: null,
+        }),
+      });
+      
+      const result = await getProviderDetails('provider123');
+      
+      expect(supabase.from).toHaveBeenCalledWith('providers');
+      expect(result).toEqual({ data: mockProvider, error: null });
+    });
+    
+    it('getProviderDetails returns error when provider not found', async () => {
+      const mockError = { message: 'Provider not found' };
+      
+      supabase.from.mockReturnValueOnce({
+        select: jest.fn().mockReturnThis(),
+        eq: jest.fn().mockReturnThis(),
+        single: jest.fn().mockResolvedValueOnce({
+          data: null,
+          error: mockError,
+        }),
+      });
+      
+      const result = await getProviderDetails('nonexistent-provider');
+      
+      expect(result).toEqual({ data: null, error: mockError });
     });
   });
 });

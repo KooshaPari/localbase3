@@ -79,7 +79,7 @@ export async function signOut() {
 
 export async function resetPassword(email: string) {
 	const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
-		redirectTo: `${window.location.origin}/reset-password`,
+		redirectTo: `${typeof window !== 'undefined' ? window.location.origin : ''}/reset-password`,
 	});
 
 	return { data, error };
@@ -118,6 +118,17 @@ export async function updateUserProfile(userId: string, updates: UserProfileUpda
 		.eq("id", userId);
 
 	return { data: data as UserProfileResponse | null, error };
+}
+
+// User profile type
+export interface UserProfile {
+	id: string;
+	name?: string;
+	email?: string;
+	avatar_url?: string;
+	created_at: string;
+	updated_at: string;
+	[key: string]: string | number | undefined;
 }
 
 // User profile update type
@@ -218,7 +229,7 @@ export async function generateApiKey(
 		.select()
 		.single();
 
-	return { data: data as ApiKeyResponse | null, error };
+	return { data: data as unknown as ApiKeyResponse | null, error };
 }
 
 export async function listApiKeys(userId: string) {

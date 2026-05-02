@@ -18,12 +18,20 @@ interface Model {
   };
 }
 
+interface JobParameters {
+  max_tokens: number;
+  temperature: number;
+  top_p: number;
+  frequency_penalty: number;
+  presence_penalty: number;
+}
+
 interface CloneJob {
   id: string;
   model_id: string;
   provider_id: string;
   input: string;
-  parameters: any;
+  parameters: JobParameters;
 }
 
 interface CreateJobFormProps {
