@@ -36,13 +36,13 @@ jobs:
           npm test -- --coverage
 
       - name: Upload Frontend Coverage
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v6
         with:
           directory: ./localbase-frontend/coverage
           flags: frontend
 
       - name: Upload API Coverage
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v6
         with:
           directory: ./localbase-api/coverage
           flags: api
