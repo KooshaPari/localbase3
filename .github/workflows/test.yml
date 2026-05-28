@@ -1,4 +1,7 @@
 name: Test
+permissions:
+  contents: read
+  pull-requests: read
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -12,17 +15,17 @@ on:
 
 jobs:
   unit-tests:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     strategy:
       matrix:
         node-version: [18.x]
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
 
       - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e
         with:
           node-version: ${{ matrix.node-version }}
           cache: "npm"
@@ -40,19 +43,19 @@ jobs:
           npm test -- --coverage
 
       - name: Upload Frontend Coverage
-        uses: codecov/codecov-action@v6
+        uses: codecov/codecov-action@e79a6962e0d4c0c17b229090214935d2e33f8354
         with:
           directory: ./localbase-frontend/coverage
           flags: frontend
 
       - name: Upload API Coverage
-        uses: codecov/codecov-action@v6
+        uses: codecov/codecov-action@e79a6962e0d4c0c17b229090214935d2e33f8354
         with:
           directory: ./localbase-api/coverage
           flags: api
 
   e2e-tests:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     needs: unit-tests
 
     strategy:
@@ -60,10 +63,10 @@ jobs:
         node-version: [18.x]
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
 
       - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e
         with:
           node-version: ${{ matrix.node-version }}
           cache: "npm"
@@ -74,7 +77,7 @@ jobs:
           npm ci
 
       - name: Run E2E Tests
-        uses: cypress-io/github-action@v7
+        uses: cypress-io/github-action@dace029018fcdf86e0df89a31bc3cfa5b32570d8
         with:
           working-directory: localbase-frontend
           build: npm run build
@@ -84,7 +87,7 @@ jobs:
           headed: false
 
   accessibility-tests:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     needs: unit-tests
 
     strategy:
@@ -92,10 +95,10 @@ jobs:
         node-version: [18.x]
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
 
       - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e
         with:
           node-version: ${{ matrix.node-version }}
           cache: "npm"
@@ -106,7 +109,7 @@ jobs:
           npm ci
 
       - name: Run Accessibility Tests
-        uses: cypress-io/github-action@v7
+        uses: cypress-io/github-action@dace029018fcdf86e0df89a31bc3cfa5b32570d8
         with:
           working-directory: localbase-frontend
           build: npm run build
@@ -117,7 +120,7 @@ jobs:
           spec: cypress/e2e/accessibility.cy.ts
 
   performance-tests:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     needs: unit-tests
 
     strategy:
@@ -125,10 +128,10 @@ jobs:
         node-version: [18.x]
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
 
       - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e
         with:
           node-version: ${{ matrix.node-version }}
           cache: "npm"
@@ -152,13 +155,13 @@ jobs:
           lighthouse http://localhost:3000 --output=json --output-path=./lighthouse-report.json --chrome-flags="--headless --no-sandbox --disable-gpu"
 
       - name: Upload Lighthouse Report
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
           name: lighthouse-report
           path: localbase-frontend/lighthouse-report.json
 
   load-tests:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     needs: unit-tests
 
     strategy:
@@ -166,10 +169,10 @@ jobs:
         node-version: [18.x]
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
 
       - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e
         with:
           node-version: ${{ matrix.node-version }}
           cache: "npm"
@@ -196,7 +199,7 @@ jobs:
           k6 run load-tests/api-load-test.js --summary-export=load-test-report.json
 
       - name: Upload Load Test Report
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
           name: load-test-report
           path: localbase-api/load-test-report.json
