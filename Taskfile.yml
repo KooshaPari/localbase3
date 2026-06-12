@@ -1,0 +1,25 @@
+version: '3'
+
+# No manifest detected in this repo.
+# Placeholder tasks - replace with actual build commands once a manifest is added.
+
+tasks:
+  validate:
+    desc: Placeholder validation task
+    cmds:
+      - echo "No manifest detected; validate placeholder"
+
+  build:
+    desc: Placeholder build task
+    cmds:
+      - echo "No manifest detected; build placeholder"
+
+  test:
+    desc: Placeholder test task
+    cmds:
+      - echo "No manifest detected; test placeholder"
+
+  lint:
+    desc: Placeholder lint task
+    cmds:
+      - echo "No manifest detected; lint placeholder"
