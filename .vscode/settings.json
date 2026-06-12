@@ -1,3 +1,29 @@
 {
-	"postman.settings.dotenv-detection-notification-visibility": false
+  // Editor
+  "editor.formatOnSave": true,
+  "editor.rulers": [100],
+  "editor.tabSize": 4,
+  "files.insertFinalNewline": true,
+  "files.trimTrailingWhitespace": true,
+  // Files
+  "files.exclude": {
+    "**/.git": true,
+    "**/target": true,
+    "**/node_modules": true,
+    "**/dist": true,
+    "**/.venv": true,
+    "**/__pycache__": true
+  },
+  "files.watcherExclude": {
+    "**/target/**": true,
+    "**/node_modules/**": true,
+    "**/.git/objects/**": true
+  },
+  // Search
+  "search.exclude": {
+    "**/target": true,
+    "**/node_modules": true,
+    "**/dist": true,
+    "**/.git": true
+  }
 }
