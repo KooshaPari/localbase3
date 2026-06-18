@@ -19,6 +19,11 @@ tasks:
     cmds:
       - echo "No manifest detected; test placeholder"
 
+  coverage:
+    desc: Coverage report (SSOT for how to measure coverage) — placeholder, no manifest yet
+    cmds:
+      - echo "No manifest detected; coverage placeholder"
+
   lint:
     desc: Placeholder lint task
     cmds:
