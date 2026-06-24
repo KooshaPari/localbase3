@@ -12,7 +12,7 @@ jobs:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           fetch-depth: 0
-      - uses: trufflesecurity/trufflehog@75add79b929b263dae147d2e5bcf0daf292165cf
+      - uses: trufflesecurity/trufflehog@3d196c8d11feff93b52cd2505f6b2c06085b99f3
         with:
           path: ./
           base: ${{ github.event.repository.default_branch }}
