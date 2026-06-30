@@ -86,7 +86,8 @@ class BlockchainClient:
             logger.warning("No wallet mnemonic provided, generating new wallet")
             mnemo = Mnemonic("english")
             self.wallet_mnemonic = mnemo.generate(strength=256)
-            logger.info(f"Generated new mnemonic: {self.wallet_mnemonic}")
+            # Do NOT log the mnemonic — it is a secret credential (audit #57)
+            logger.info("Generated new wallet mnemonic (value redacted)")
         
         try:
             self.wallet = LocalWallet.from_mnemonic(self.wallet_mnemonic)

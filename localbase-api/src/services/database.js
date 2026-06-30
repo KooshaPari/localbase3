@@ -5,6 +5,7 @@
 
 const supabase = require("./supabase");
 const { v4: uuidv4 } = require("uuid");
+const { hashApiKey } = require("../utils/keyHash");
 const {
 	ResourceNotFoundError,
 	ServiceUnavailableError,
@@ -49,11 +50,12 @@ class DatabaseService {
 	 */
 	async findUserByApiKey(apiKey) {
 		try {
-			// First, find the API key
+			// Look up by HMAC hash so the plaintext key never hits the DB (audit #57)
+			const keyHash = hashApiKey(apiKey);
 			const { data: apiKeyData, error: apiKeyError } = await supabase
 				.from("api_keys")
 				.select("user_id, last_used")
-				.eq("key", apiKey)
+				.eq("key_hash", keyHash)
 				.eq("active", true)
 				.single();
 
@@ -61,11 +63,11 @@ class DatabaseService {
 				return null;
 			}
 
-			// Update last used timestamp
+			// Update last used timestamp (by hash, never by plaintext key)
 			await supabase
 				.from("api_keys")
 				.update({ last_used: new Date() })
-				.eq("key", apiKey);
+				.eq("key_hash", keyHash);
 
 			// Get the user
 			const { data: userData, error: userError } = await supabase
@@ -135,9 +137,9 @@ class DatabaseService {
 			// Generate API key
 			const key = `lb_sk_${uuidv4().replace(/-/g, "")}`;
 
-			// Create API key in database
+			// Store only the HMAC hash — never the raw plaintext key (audit #57)
 			const { error } = await supabase.from("api_keys").insert({
-				key,
+				key_hash: hashApiKey(key),
 				user_id: userId,
 				name,
 			});
@@ -498,5 +500,7 @@ class DatabaseService {
 	}
 }
 
-// Export singleton instance
-module.exports = new DatabaseService();
+// Export singleton instance and hashApiKey helper (used by tests + key-rotation scripts)
+const databaseService = new DatabaseService();
+module.exports = databaseService;
+module.exports.hashApiKey = hashApiKey;
