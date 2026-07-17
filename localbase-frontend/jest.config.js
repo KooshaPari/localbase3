@@ -19,6 +19,7 @@ const customJestConfig = {
     '^@/utils/(.*)$': '<rootDir>/utils/$1',
     '^@/services/(.*)$': '<rootDir>/services/$1',
     '^@/types/(.*)$': '<rootDir>/types/$1',
+    '^@/lib/(.*)$': '<rootDir>/lib/$1',
   },
   collectCoverage: true,
   collectCoverageFrom: [

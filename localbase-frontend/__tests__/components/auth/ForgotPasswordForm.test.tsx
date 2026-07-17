@@ -26,15 +26,15 @@ describe('ForgotPasswordForm', () => {
     expect(screen.getByText('Reset Your Password')).toBeInTheDocument();
     expect(screen.getByText(/enter your email address/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/email address/i)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /send reset link/i })).toBeInTheDocument();
-    expect(screen.getByText(/back to sign in/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /send reset instructions/i })).toBeInTheDocument();
+    expect(screen.getByText(/sign in/i)).toBeInTheDocument();
   });
   
   it('validates email input', async () => {
     render(<ForgotPasswordForm />);
     
     // Try to submit with empty email
-    fireEvent.click(screen.getByRole('button', { name: /send reset link/i }));
+    fireEvent.click(screen.getByRole('button', { name: /send reset instructions/i }));
     
     await waitFor(() => {
       expect(screen.getByText(/please enter your email address/i)).toBeInTheDocument();
@@ -58,14 +58,14 @@ describe('ForgotPasswordForm', () => {
     });
     
     // Submit the form
-    fireEvent.click(screen.getByRole('button', { name: /send reset link/i }));
+    fireEvent.click(screen.getByRole('button', { name: /send reset instructions/i }));
     
     await waitFor(() => {
       // Verify resetPassword was called with correct parameters
       expect(mockResetPassword).toHaveBeenCalledWith('test@example.com');
       
       // Verify success message is displayed
-      expect(screen.getByText(/check your email for a password reset link/i)).toBeInTheDocument();
+      expect(screen.getByText(/password reset instructions have been sent/i)).toBeInTheDocument();
     });
     
     // Verify no error message is displayed
@@ -85,7 +85,7 @@ describe('ForgotPasswordForm', () => {
     });
     
     // Submit the form
-    fireEvent.click(screen.getByRole('button', { name: /send reset link/i }));
+    fireEvent.click(screen.getByRole('button', { name: /send reset instructions/i }));
     
     await waitFor(() => {
       // Verify error message is displayed
@@ -93,7 +93,7 @@ describe('ForgotPasswordForm', () => {
     });
     
     // Verify success message is not displayed
-    expect(screen.queryByText(/check your email for a password reset link/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/password reset instructions have been sent/i)).not.toBeInTheDocument();
   });
   
   it('handles unexpected errors', async () => {
@@ -107,7 +107,7 @@ describe('ForgotPasswordForm', () => {
     });
     
     // Submit the form
-    fireEvent.click(screen.getByRole('button', { name: /send reset link/i }));
+    fireEvent.click(screen.getByRole('button', { name: /send reset instructions/i }));
     
     await waitFor(() => {
       // Verify error message is displayed
@@ -115,7 +115,7 @@ describe('ForgotPasswordForm', () => {
     });
     
     // Verify success message is not displayed
-    expect(screen.queryByText(/check your email for a password reset link/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/password reset instructions have been sent/i)).not.toBeInTheDocument();
   });
   
   it('disables the submit button during form submission', async () => {
@@ -136,14 +136,14 @@ describe('ForgotPasswordForm', () => {
     });
     
     // Submit the form
-    fireEvent.click(screen.getByRole('button', { name: /send reset link/i }));
+    fireEvent.click(screen.getByRole('button', { name: /send reset instructions/i }));
     
     // Verify button is disabled and shows loading state
     expect(screen.getByRole('button', { name: /sending/i })).toBeDisabled();
     
     await waitFor(() => {
       // After completion, verify success message is displayed
-      expect(screen.getByText(/check your email for a password reset link/i)).toBeInTheDocument();
+      expect(screen.getByText(/password reset instructions have been sent/i)).toBeInTheDocument();
     });
   });
 });
